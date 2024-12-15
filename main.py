@@ -2,6 +2,7 @@ import discord
 from discord.ext import commands
 import apikey
 import asyncio
+import os
 
 # Set up intents
 intents = discord.Intents.default()  # Default intents
@@ -10,6 +11,7 @@ intents.message_content = True  # Allows your bot to read message content
 intents.members = True  # Allows your bot to access member-related events (optional, depends on your use case)
 
 clients = commands.Bot(command_prefix = '/',intents=intents)
+
 
 @clients.event
 async def on_ready():
@@ -56,4 +58,5 @@ async def leave(ctx):
         await ctx.send("I'm not in a voice channel.")
 
 
-clients.run('Discord_bot')
+
+clients.run(os.getenv(('DISCORD_TOKEN')))
