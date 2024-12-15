@@ -5,6 +5,7 @@ import asyncio
 import os
 from dotenv import load_dotenv
 load_dotenv()
+print(os.getenv('DISCORD_TOKEN'))
 
 # Set up intents
 intents = discord.Intents.default()  # Default intents
@@ -61,4 +62,4 @@ async def leave(ctx):
 
 
 
-clients.run(os.getenv(('DISCORD_TOKEN')))
+clients.run(os.getenv('DISCORD_TOKEN'))
