@@ -3,6 +3,8 @@ from discord.ext import commands
 import apikey
 import asyncio
 import os
+from dotenv import load_dotenv
+load_dotenv()
 
 # Set up intents
 intents = discord.Intents.default()  # Default intents
