@@ -12,7 +12,7 @@ def fetch_joke():
         return joke
     return "Oops! I couldn't fetch a joke right now. But welcome!"
 
-print(fetch_joke())
+
 
 
 
