@@ -2,14 +2,11 @@ import discord
 from discord.ext import commands
 import apikey
 import asyncio
-from flask import Flask
-import threading
 import os
 from dotenv import load_dotenv
 
 load_dotenv()
 
-app = Flask(__name__)
 
 # Set up intents
 intents = discord.Intents.default()  # Default intents
@@ -36,6 +33,7 @@ async def on_member_join(member):
     channel = clients.get_channel(1313061297880829974)  # Replace with your channel ID
     await channel.send(f"Welcome to the server, {member.mention}! Glad to see you here 🥰.")
     await channel.send(f"**{apikey.fetch_joke()}**")
+    await channel.send(f"{member.mention}, did you like the joke?")
 
 
 @clients.event
@@ -67,14 +65,3 @@ async def leave(ctx):
 
 
 clients.run(os.getenv('BOT_TOKEN'))
-
-
-@app.route('/')
-def home():
-    return "Bot is running!"
-
-def run_web_server():
-    app.run(host='0.0.0.0', port=8080)
-
-# Start Flask in a separate thread
-threading.Thread(target=run_web_server).start()

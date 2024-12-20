@@ -11,11 +11,13 @@ colorama==0.4.6
 discord.py==2.4.0
 Flask==3.1.0
 frozenlist==1.5.0
+gunicorn==23.0.0
 idna==3.10
 itsdangerous==2.2.0
 Jinja2==3.1.4
 MarkupSafe==3.0.2
 multidict==6.1.0
+packaging==24.2
 propcache==0.2.1
 pycparser==2.22
 PyNaCl==1.5.0
