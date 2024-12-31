@@ -27,6 +27,16 @@ async def hello(ctx):
     await ctx.send("Hello, I'm here.")
 
 
+@clients.command(pass_context=True)
+async def welcome(ctx,channel:discord.TextChannel):
+    channel = clients.get_channel(channel)
+    if channel:
+        await channel.send(f"Welcome to {channel.mention}!")
+    else:
+        await ctx.send("Channel not found!")
+    return channel.id
+
+
 @clients.event
 async def on_member_join(member):
     apikey.fetch_joke
@@ -42,26 +52,23 @@ async def on_member_remove(member):
     await channel.send(f"{member.mention} has left or been removed!")
 
 @clients.command(pass_context=True)
-async def join_voice_chat(ctx):
-    if ctx.author.voice:
-        channel = ctx.author.voice.channel
-        voice = await channel.connect()
-        voice.play(discord.FFmpegPCMAudio("joke.mp3"))
-        while voice.is_playing():
-            await asyncio.sleep(1)
-        await voice.disconnect()
+async def joinVoiceChat(ctx,channel:discord.VoiceChannel):
+    # voice_channel = clients.get_channel(channel)
+    if channel:
+        await channel.connect()
+        await ctx.send(f"Joined {channel}")
 
     else:
-        await ctx.send("You are not in a voice channel.")
+        await ctx.send("Voice channel not found!")
 
 
 @clients.command()
-async def leave(ctx):
+async def leaveVoiceChat(ctx):
     if ctx.voice_client:
         await ctx.guild.voice_client.disconnect()
     else:
         await ctx.send("I'm not in a voice channel.")
 
 
-
+# def activate_bot():
 clients.run(os.getenv('BOT_TOKEN'))
