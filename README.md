@@ -3,6 +3,7 @@
 Synthia is a feature-rich Discord bot designed to provide real-time updates and enhancements to your server. It specializes in fetching and displaying the latest AI-related news in a dedicated channel, offering an automated news feed experience. Additionally, Synthia is built to demonstrate web scraping skills and runs seamlessly on a Docker container for 24/7 availability.
 
 ---
+![Synthia](https://imgur.com/a/Yl42BFP)
 
 ## Features
 
