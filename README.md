@@ -59,12 +59,12 @@ Synthia is a feature-rich Discord bot designed to provide real-time updates and 
 
 1. Build the Docker image:
    ```bash
-   docker build -t synthia_bot .
+   docker build -t synthia-bot .
    ```
 
 2. Run the container:
    ```bash
-   docker run -d --name synthia_bot synthia_bot
+   docker run -d --name synthia-container synthia-bot
    ```
 
 3. Ensure 24/7 availability by hosting the container on a cloud platform like AWS, Azure, or DigitalOcean.
