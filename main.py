@@ -26,21 +26,28 @@ async def on_ready():
 async def hello(ctx):
     await ctx.send("Hello, I'm here.")
 
+welcome_channel_id = ''
 
 @clients.command(pass_context=True)
-async def welcome(ctx,channel:discord.TextChannel):
-    channel = clients.get_channel(channel)
+async def welcome(ctx,channel:discord.TextChannel) -> str:
+    # channel = clients.get_channel(channel)
     if channel:
-        await channel.send(f"Welcome to {channel.mention}!")
-    else:
-        await ctx.send("Channel not found!")
-    return channel.id
+        # await channel.connect
+        await ctx.send(f"Welcome to {channel.mention}! The channel id is {channel.id}")
+        global welcome_channel_id
+        welcome_channel_id = channel.id
+        return channel.id
+    # else:
+    await ctx.send(f"Channel {channel} not found!")
+    return -1
 
+# welcome_channel_id = welcome(clients, discord.TextChannel)
 
 @clients.event
 async def on_member_join(member):
     apikey.fetch_joke
-    channel = clients.get_channel(1313061297880829974)  # Replace with your channel ID
+    global welcome_channel_id
+    channel = clients.get_channel(welcome_channel_id)  # Replace with your channel ID
     await channel.send(f"Welcome to the server, {member.mention}! Glad to see you here 🥰.")
     await channel.send(f"**{apikey.fetch_joke()}**")
     await channel.send(f"{member.mention}, did you like the joke?")
