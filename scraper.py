@@ -4,7 +4,8 @@ import bs4 as bs
 
 headers = {
     # 'authority': 'www.ainews.com',
-    'referer': 'https://www.ainews.com/',
+    'referer' : 'https://www.artificialintelligence-news.com',
+    # 'referer': 'https://www.ainews.com/',
     'accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9',
     'accept-language': 'en-US,en;q=0.9',
     'cache-control': 'no-cache',
@@ -21,8 +22,9 @@ headers = {
     'user-agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/108.0.0.0 Safari/537.36',
 }
 
-url = 'https://www.ainews.com/p/5-ai-scams-poised-to-surge-in-2025-and-how-to-stay-safe'
-
+# url = 'https://www.ainews.com/p/5-ai-scams-poised-to-surge-in-2025-and-how-to-stay-safe'
+url = 'https://www.artificialintelligence-news.com/news/rethinking-video-surveillance-the-case-for-smarter-more-flexible-solutions/'
 response = requests.get(url, headers=headers)
 
 print(response.status_code)
+
