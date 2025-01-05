@@ -10,6 +10,9 @@ Synthia is a feature-rich Discord bot designed to provide real-time updates and 
 
 ## Features
 
+- **Welcome with a Joke:**
+   Welcomes new members to your server with a personalized joke, setting a friendly tone for interactions. (Feature under development, nearly complete.)
+
 - **AI News Feed**:
   Automatically fetches the latest AI-related news from top sources and posts it in a specified Discord channel.
 
