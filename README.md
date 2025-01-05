@@ -35,8 +35,8 @@ Synthia is a feature-rich Discord bot designed to provide real-time updates and 
 
 1. Clone the repository:
    ```bash
-   git clone https://github.com/yourusername/synthia-bot.git
-   cd synthia-bot
+   git clone https://github.com/rakinplaban/Discord_chat_miku
+   cd Discord_chat_miku
    ```
 
 2. Install dependencies:
@@ -48,13 +48,13 @@ Synthia is a feature-rich Discord bot designed to provide real-time updates and 
    - Create a `.env` file in the root directory.
    - Add your Discord bot token:
      ```env
-     DISCORD_TOKEN=your_discord_bot_token
-     CHANNEL_ID=your_channel_id
+     BOT_TOKEN=your_discord_bot_token
+     <!-- CHANNEL_ID=your_channel_id -->
      ```
 
 4. Run the bot:
    ```bash
-   python bot.py
+   python main.py
    ```
 
 ---
