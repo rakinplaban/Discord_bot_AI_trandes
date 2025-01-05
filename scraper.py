@@ -1,6 +1,7 @@
 import requests
 import json
 import bs4 as bs
+from bs4 import BeautifulSoup
 
 headers = {
     # 'authority': 'www.ainews.com',
@@ -28,3 +29,21 @@ response = requests.get(url, headers=headers)
 
 print(response.status_code)
 
+context = BeautifulSoup(response.content, 'lxml')
+
+# print(context.prettify())
+
+# with open('test.html', 'w') as f:
+#     f.write(context.prettify())
+
+
+content = context.h1.text
+
+print(content)
+
+section = context.find('section', {'class': 'entry-content'})
+# attachment-full size-full wp-post-image
+image = context.find('img',{'class':'attachment-full size-full wp-post-image'})['src']
+print(image)
+
+print(section.find('p').text)
