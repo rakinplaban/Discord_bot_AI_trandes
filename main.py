@@ -2,8 +2,13 @@ import discord
 from discord.ext import commands
 import apikey
 import asyncio
+from apscheduler.schedulers.asyncio import AsyncIOScheduler
+import feedparser
+import requests
+from bs4 import BeautifulSoup as bfsoup
 import os
 from dotenv import load_dotenv
+import json
 
 load_dotenv()
 
@@ -16,16 +21,102 @@ intents.members = True  # Allows your bot to access member-related events (optio
 
 clients = commands.Bot(command_prefix = '/',intents=intents)
 
+scheduler = AsyncIOScheduler()
+
+
+def get_ai_news():
+    seen_titles = set()
+    news_items = []
+
+    def add_entry(title, link, source_emoji):
+        if title not in seen_titles:
+            seen_titles.add(title)
+            news_items.append(f"{source_emoji} **{title}**\n🔗 {link}")
+
+    # --- MarkTechPost AI ---
+    try:
+        feed = feedparser.parse("https://www.marktechpost.com/category/artificial-intelligence/feed/")
+        for entry in feed.entries[:3]:
+            title = entry.title
+            link = entry.link
+            add_entry(title, link, "🧠")
+            # news_items.append(f"🧠 **{title}**\n🔗 {link}")
+    except Exception as e:
+        news_items.append(f"⚠️ MarkTechPost error: {e}")
+
+
+    # --- arXiv AI ---
+    try:
+        feed = feedparser.parse("http://export.arxiv.org/rss/cs.AI")
+        for entry in feed.entries[:3]:
+            title = entry.title
+            link = entry.link
+            # news_items.append(f"📚 **{title}**\n🔗 {link}")
+            add_entry(title, link, "📚")
+    except Exception as e:
+        news_items.append(f"⚠️ arXiv error: {e}")
+
+    # --- Hugging Face Blog (no feed, fallback to scrape or skip) ---
+    try:
+        res = requests.get("https://huggingface.co/blog")
+        soup = bfsoup(res.text, "html.parser")
+        posts = soup.select("a[href^='/blog/']")[:2]
+        for a in posts:
+            title = a.text.strip()
+            link = "https://huggingface.co" + a["href"]
+            if title:
+                add_entry(title, link, "🤗")
+                # news_items.append(f"🤗 **{title}**\n🔗 {link}")
+    except Exception as e:
+        news_items.append(f"⚠️ HuggingFace error: {e}")
+
+    return "\n\n".join(news_items) if news_items else "No fresh AI news today."
+
 
 @clients.event
 async def on_ready():
     print("Bot is ready")
     print("-------------")
+    scheduler.start()
+    scheduler.add_job(send_ai_news, "interval", hours=24)
+    await send_ai_news()
+
+
+CHANNEL_FILE = "channels.json"
+
+# Load saved channels
+def load_channels():
+    try:
+        with open(CHANNEL_FILE, "r") as f:
+            return json.load(f)
+    except:
+        return {}
+
+# Save channels
+def save_channels(data):
+    with open(CHANNEL_FILE, "w") as f:
+        json.dump(data, f)
+
+channels = load_channels()
 
 @clients.command()
-async def hello(ctx):
-    await ctx.send("Hello, I'm here.")
+async def set_news_channel(ctx):
+    user_id = str(ctx.author.id)
+    channel_id = ctx.channel.id
+    channels[user_id] = channel_id
+    save_channels(channels)
+    await ctx.send(f"📡 Got it! You'll receive AI updates in this channel.")
 
+async def send_ai_news():
+
+    for usr_id, channel_id in channels.items():
+        channel = clients.get_channel(channel_id)
+        print(f"I am looking for latest ai news and share on Channel {channel}")
+        news_content = get_ai_news()
+        await channel.send(f"📰 **AI Trend Report**\n{news_content}")
+
+
+# Welcoming new members on Server.
 welcome_channel_id = ''
 
 @clients.command(pass_context=True)
@@ -75,6 +166,9 @@ async def leaveVoiceChat(ctx):
         await ctx.guild.voice_client.disconnect()
     else:
         await ctx.send("I'm not in a voice channel.")
+
+
+
 
 
 # def activate_bot():

@@ -52,7 +52,6 @@ Synthia is a feature-rich Discord bot designed to provide real-time updates and 
    - Add your Discord bot token:
      ```env
      BOT_TOKEN=your_discord_bot_token
-     <!-- CHANNEL_ID=your_channel_id -->
      ```
 
 4. Run the bot:
@@ -128,5 +127,8 @@ This project is licensed under the MIT License. See the LICENSE file for details
 
 ---
 
-Enjoy using Synthia! If you encounter any issues or have feature requests, feel free to open an issue or contact us.
+Enjoy using Synthia! If you encounter any issues or have feature requests, feel free to open an [issue](https://github.com/rakinplaban/Discord_chat_miku/issues) or contact me.
 
+<h1 align="center">
+   <img src="https://i.imgur.com/rm70p64.jpg" height="250" width="250"/>
+</h1>
