@@ -116,7 +116,7 @@ Synthia is a feature-rich Discord bot designed to provide real-time updates and 
 
 ## License
 
-This project is licensed under the MIT License. See the LICENSE file for details.
+This project is licensed under the Apache-2.0 License. See the [LICENSE](LICENSE) file for details.
 
 ---
 
@@ -130,5 +130,5 @@ This project is licensed under the MIT License. See the LICENSE file for details
 Enjoy using Synthia! If you encounter any issues or have feature requests, feel free to open an [issue](https://github.com/rakinplaban/Discord_chat_miku/issues) or contact me.
 
 <h1 align="center">
-   <img src="https://i.imgur.com/rm70p64.jpg" height="250" width="250"/>
+   <img src="https://animemagic.vercel.app/anime-image?t=123456" height="250" width="250"/>
 </h1>
