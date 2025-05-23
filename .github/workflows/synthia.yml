@@ -4,11 +4,14 @@ on:
   workflow_dispatch:      # Manual trigger
   push:
     branches:
-      - main              # Run on push to main
+      - master              # Run on push to main
+
 
 jobs:
   run-bot:
     runs-on: ubuntu-latest
+    env:
+      BOT_TOKEN: ${{ secrets.BOT_TOKEN }}
 
     steps:
     - name: Checkout code
