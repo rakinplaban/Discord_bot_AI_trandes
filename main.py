@@ -79,7 +79,7 @@ async def on_ready():
     print("-------------")
     scheduler.start()
     scheduler.add_job(send_ai_news, "interval", hours=24)
-    await send_ai_news()
+    # await send_ai_news()
 
 
 CHANNEL_FILE = "channels.json"
