@@ -1,0 +1,35 @@
+name: Run Synthia Bot
+
+on:
+  workflow_dispatch:      # Manual trigger
+  push:
+    branches:
+      - main              # Run on push to main
+
+jobs:
+  run-bot:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
+
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+
+    - name: Run Synthia
+      run: |
+        python main.py
+
+    - name: Keep alive
+      run: |
+        sudo apt-get install -y tmate
+        tmate -F new-session -d
+        while true; do sleep 300; done
