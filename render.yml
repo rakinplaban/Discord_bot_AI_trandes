@@ -1,0 +1,14 @@
+services:
+  - type: worker
+    name: synthia-bot
+    env: python
+    region: oregon
+    plan: free
+    repo: https://github.com/rakinplaban/Discord_chat_miku
+    branch: master
+    buildCommand: pip install -r requirements.txt
+    startCommand: python main.py
+    autoDeploy: true
+    envVars:
+      - key: BOT_TOKEN
+        sync: false
