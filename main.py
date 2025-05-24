@@ -1,7 +1,7 @@
 import discord
 from discord.ext import commands
 import apikey
-import asyncio
+from apscheduler.triggers.cron import CronTrigger
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 import feedparser
 import requests
@@ -78,7 +78,7 @@ async def on_ready():
     print("Bot is ready")
     print("-------------")
     scheduler.start()
-    scheduler.add_job(send_ai_news, "interval", hours=24)
+    scheduler.add_job(send_ai_news, CronTrigger(hour=0, minute=0,  timezone='Asia/Tokyo'))
     # await send_ai_news()
 
 
