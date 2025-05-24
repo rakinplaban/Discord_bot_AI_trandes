@@ -75,8 +75,12 @@ def get_ai_news():
 
 @clients.event
 async def on_ready():
-    print("Bot is ready")
-    print("-------------")
+    print(f"Logged in as {clients.user}")
+    try:
+        synced = await clients.tree.sync()
+        print(f"Synced {len(synced)} command(s)")
+    except Exception as e:
+        print("Command sync failed:", e)
     scheduler.start()
     scheduler.add_job(send_ai_news, CronTrigger(hour=0, minute=0,  timezone='Asia/Tokyo'))
     # await send_ai_news()
@@ -144,11 +148,27 @@ async def on_member_join(member):
     await channel.send(f"{member.mention}, did you like the joke?")
 
 
+good_bye = ''
+
+@clients.command(pass_context=True)
+async def welcome(ctx,channel:discord.TextChannel) -> str:
+    # channel = clients.get_channel(channel)
+    if channel:
+        # await channel.connect
+        await ctx.send(f"Welcome to {channel.mention}! The channel id is {channel.id}")
+        global good_bye
+        good_bye = channel.id
+        return channel.id
+    # else:
+    await ctx.send(f"Channel {channel} not found!")
+    return -1
+
+
 @clients.event
 async def on_member_remove(member):
     apikey.fetch_joke
-    global welcome_channel_id
-    channel = clients.get_channel(welcome_channel_id)  # Replace with your channel ID
+    global good_bye
+    channel = clients.get_channel(good_bye)  # Replace with your channel ID
     await channel.send(f"{member.mention} has left or been removed!")
 
 @clients.command(pass_context=True)
