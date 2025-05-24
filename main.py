@@ -151,11 +151,11 @@ async def on_member_join(member):
 good_bye = ''
 
 @clients.command(pass_context=True)
-async def welcome(ctx,channel:discord.TextChannel) -> str:
+async def memberLeaves(ctx,channel:discord.TextChannel) -> str:
     # channel = clients.get_channel(channel)
     if channel:
         # await channel.connect
-        await ctx.send(f"Welcome to {channel.mention}! The channel id is {channel.id}")
+        await ctx.send(f"Configuration completed on {channel.mention}! When a member leaves, it'll appear here {channel.id}")
         global good_bye
         good_bye = channel.id
         return channel.id
