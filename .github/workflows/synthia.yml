@@ -24,7 +24,7 @@ jobs:
 
       - name: Run Synthia
         env:
-          DISCORD_TOKEN: ${{ secrets.BOT_TOKEN }}
+          BOT_TOKEN: ${{ secrets.BOT_TOKEN }}
         run: |
           python main.py  # Adjust if your entry file is different
 
