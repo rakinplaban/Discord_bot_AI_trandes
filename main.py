@@ -146,7 +146,9 @@ async def on_member_join(member):
 
 @clients.event
 async def on_member_remove(member):
-    channel = clients.get_channel(1313159077844619274)  # Replace with your channel ID
+    apikey.fetch_joke
+    global welcome_channel_id
+    channel = clients.get_channel(welcome_channel_id)  # Replace with your channel ID
     await channel.send(f"{member.mention} has left or been removed!")
 
 @clients.command(pass_context=True)
