@@ -9,6 +9,7 @@ from bs4 import BeautifulSoup as bfsoup
 import os
 from dotenv import load_dotenv
 import json
+from db_connection import DB_Connection
 
 load_dotenv()
 
@@ -22,6 +23,7 @@ intents.members = True  # Allows your bot to access member-related events (optio
 clients = commands.Bot(command_prefix = '/',intents=intents)
 
 scheduler = AsyncIOScheduler()
+
 
 
 def get_ai_news():
@@ -82,59 +84,210 @@ async def on_ready():
     except Exception as e:
         print("Command sync failed:", e)
     scheduler.start()
-    scheduler.add_job(send_ai_news, CronTrigger(hour=0, minute=0,  timezone='Asia/Tokyo'))
+    scheduler.add_job(send_ai_news, CronTrigger(hour=1, minute=2,  timezone='Asia/Tokyo'))
     # await send_ai_news()
 
 
-CHANNEL_FILE = "channels.json"
+#setup channel for a command.
+async def set_command_channel(interaction, command: str):
+    connection = DB_Connection()
+    conn = connection.db_connect()
+    if conn is None:
+        # message = "❌ Failed to connect to the database."
+        return False
 
-# Load saved channels
-def load_channels():
     try:
-        with open(CHANNEL_FILE, "r") as f:
-            return json.load(f)
-    except:
-        return {}
+        cursor = conn.cursor()
 
-# Save channels
-def save_channels(data):
-    with open(CHANNEL_FILE, "w") as f:
-        json.dump(data, f)
+        # Fetch the internal server ID
+        fetch_server_sql = "SELECT id FROM server WHERE guild_id = %s;"
+        cursor.execute(fetch_server_sql, (interaction.guild.id,))
+        server_result = cursor.fetchone()
 
-channels = load_channels()
+        if server_result is None:
+            # message = "❌ This server is not registered in the database."
+            return False #, message
 
-@clients.command()
-async def set_news_channel(ctx):
-    user_id = str(ctx.author.id)
-    channel_id = ctx.channel.id
-    channels[user_id] = channel_id
-    save_channels(channels)
-    await ctx.send(f"📡 Got it! You'll receive AI updates in this channel.")
+        # Explanation of `server_id = server_result[0]`
+        # `cursor.fetchone()` returns a tuple, like (12,) — the first item is the internal 'id'
+        server_id = server_result[0]
 
+        insert_sql = '''
+            INSERT INTO channel (channel_id, name, command, activator, join_date, server_id)
+            VALUES (%s, %s, %s, %s, NOW(), %s)
+            ON CONFLICT (channel_id)
+            DO UPDATE SET
+                name = EXCLUDED.name,
+                command = EXCLUDED.command,
+                activator = EXCLUDED.activator,
+                join_date = EXCLUDED.join_date,
+                remove_date = NULL,
+                server_id = EXCLUDED.server_id;
+        '''
+
+        cursor.execute(
+            insert_sql,
+            (
+                interaction.channel.id,
+                interaction.channel.name,
+                command,
+                interaction.user.id,
+                server_id
+            )
+        )
+
+        conn.commit()
+        # message = f"✅ Channel registered for `{command}` command!"
+        return True #, message
+
+    except Exception as e:
+        await interaction.response.send_message(f"❌ Database error: {e}")
+
+    finally:
+        cursor.close()
+        conn.close()
+
+
+# AI news channel setup.
+@clients.tree.command(name="news", description="Get the latest AI news!")
+async def set_news_channel(interaction):
+    if interaction.response.is_done():
+        # Already responded somehow (possible duplicate trigger)
+        return
+
+    try:
+        await interaction.response.defer(thinking=True) 
+
+        success = await set_command_channel(interaction, 'news')
+
+        # Safe follow-up only
+        if success:
+            await interaction.followup.send("📡 Got it! You'll receive AI updates in this channel.")
+            
+        else:
+            await interaction.followup.send(f"❌ Channel didn't setup! 😭")
+            
+
+    except Exception as e:
+        # Just in case there's an unexpected failure
+        if not interaction.response.is_done():
+            await interaction.response.send_message(f"⚠️ Error: {e}", ephemeral=True)
+        else:
+            await interaction.followup.send(f"⚠️ Error: {e}", ephemeral=True)
+
+
+# Send AI news to defined channels.
 async def send_ai_news():
+    connection = DB_Connection()
+    conn = connection.db_connect()
+    if conn is None:
+        print("Connection Faild! 😵‍💫")
 
-    for usr_id, channel_id in channels.items():
+    try:
+        cursor = conn.cursor()
+
+        # Fetch the internal server ID
+        fetch_channel_sql = "SELECT channel_id FROM channel WHERE command = 'news';"
+        cursor.execute(fetch_channel_sql)
+        channel_result = cursor.fetchone()
+
+        if channel_result:
+            channel_ids = channel_result[0]
+            channels = (channel_ids,)
+
+        conn.commit()
+        
+    except Exception as e:
+        print("Database connection Error! 😔")
+    finally:
+        cursor.close()
+        conn.close()
+
+    print(channels)
+    for channel_id in channels:
         channel = clients.get_channel(channel_id)
         print(f"I am looking for latest ai news and share on Channel {channel}")
         news_content = get_ai_news()
         await channel.send(f"📰 **AI Trend Report**\n{news_content}")
 
 
+#on join server
+@clients.event
+async def on_guild_join(guild):
+    connection = DB_Connection()
+    conn = connection.db_connect()
+    # cursor = conn.cursor()
+    
+    sql = """
+    INSERT INTO server (guild_id, name, join_date)
+    VALUES (%s, %s, NOW())
+    ON CONFLICT (guild_id)
+    DO UPDATE SET name = EXCLUDED.name;
+    """
+    cursor = conn.cursor()
+    cursor.execute(sql, (guild.id, guild.name))
+    conn.commit()
+    cursor.close()
+    conn.close()
+
+# on leave the server.
+@clients.event
+async def on_guild_remove(guild):
+    connection = DB_Connection()
+    conn = connection.db_connect()
+    # cursor = conn.cursor()
+    
+    sql = """
+    delete from server
+    WHERE guild_id = %s;
+    """
+    cursor = conn.cursor()
+    cursor.execute(sql, (guild.id,))
+    conn.commit()
+    cursor.close()
+    conn.close()
+
+
 # Welcoming new members on Server.
 welcome_channel_id = ''
 
-@clients.command(pass_context=True)
-async def welcome(ctx,channel:discord.TextChannel) -> str:
-    # channel = clients.get_channel(channel)
-    if channel:
-        # await channel.connect
-        await ctx.send(f"Welcome to {channel.mention}! The channel id is {channel.id}")
-        global welcome_channel_id
-        welcome_channel_id = channel.id
-        return channel.id
-    # else:
-    await ctx.send(f"Channel {channel} not found!")
-    return -1
+# @clients.command(pass_context=True)
+# async def welcome(ctx,channel:discord.TextChannel) -> str:
+#     # channel = clients.get_channel(channel)
+#     if channel:
+#         # await channel.connect
+#         await ctx.send(f"Welcome to {channel.mention}! The channel id is {channel.id}")
+#         global welcome_channel_id
+#         welcome_channel_id = channel.id
+#         return channel.id
+#     # else:
+#     await ctx.send(f"Channel {channel} not found!")
+#     return -1
+@clients.tree.command(name="welcome", description="Welcomes a new member with joke!")
+async def welcome(interaction) -> str:
+    if interaction.response.is_done():
+        # Already responded somehow (possible duplicate trigger)
+        return
+
+    try:
+        await interaction.response.defer(thinking=True) 
+
+        success = await set_command_channel(interaction, 'welcome')
+
+        # Safe follow-up only
+        if success:
+            await interaction.followup.send(f"✅ Welcome channel setup complete!")
+            
+        else:
+            await interaction.followup.send(f"❌ Channel didn't setup! 😭")
+            
+
+    except Exception as e:
+        # Just in case there's an unexpected failure
+        if not interaction.response.is_done():
+            await interaction.response.send_message(f"⚠️ Error: {e}", ephemeral=True)
+        else:
+            await interaction.followup.send(f"⚠️ Error: {e}", ephemeral=True)
 
 # welcome_channel_id = welcome(clients, discord.TextChannel)
 
@@ -194,4 +347,6 @@ async def leaveVoiceChat(ctx):
 
 
 # def activate_bot():
-clients.run(os.getenv('BOT_TOKEN'))
+if __name__ == '__main__':
+    clients.run(os.getenv('BOT_TOKEN'))
+
