@@ -293,12 +293,103 @@ async def welcome(interaction) -> str:
 
 @clients.event
 async def on_member_join(member):
-    apikey.fetch_joke
-    global welcome_channel_id
-    channel = clients.get_channel(welcome_channel_id)  # Replace with your channel ID
-    await channel.send(f"Welcome to the server, {member.mention}! Glad to see you here 🥰.")
-    await channel.send(f"**{apikey.fetch_joke()}**")
-    await channel.send(f"{member.mention}, did you like the joke?")
+    connection = DB_Connection()
+    conn = connection.db_connect()
+    if conn is None:
+        raise Exception("Database could not connect!")
+
+    try:
+        cursor = conn.cursor()
+
+        # Fetch the internal server ID
+        fetch_server_sql = "SELECT id FROM server WHERE guild_id = %s;"
+        cursor.execute(fetch_server_sql, (member.guild.id,))
+        server_result = cursor.fetchone()
+
+        if server_result is None:
+            raise Exception("Could not find server!") 
+
+        
+        server_id = server_result[0]
+        
+        # extracting channel,
+        fetch_channel_sql = "SELECT channel.id FROM channel, users WHERE channel.server_id = %s and command = 'welcome' and users.server_id = channel.server_id;"
+        cursor.execute(fetch_channel_sql, (server_id,))
+        channel_result = cursor.fetchone()
+
+        if channel_result is None:
+            raise Exception("404 - Channel Not Found!")
+
+        
+        channel_id = channel_result[0]
+        # welcome_channel = member.guild.get_channel(welcome_channel_id)
+
+        insert_sql = '''
+            INSERT INTO users (user_id, name, join_date, server_id, channel_id)
+            VALUES (%s, %s, NOW(), %s, %s)
+            ON CONFLICT (user_id)
+            DO UPDATE SET
+                name = EXCLUDED.name,
+                join_date = EXCLUDED.join_date,
+                server_id = EXCLUDED.server_id,
+                channel_id = EXCLUDED.channel_id;
+        '''
+
+        cursor.execute(
+            insert_sql,
+            (
+                member.id,
+                member.name,
+                server_id,
+                channel_id,
+            )
+        )
+
+
+        # extracting channel,
+        fetch_channel_sql = "SELECT channel.channel_id FROM channel, users WHERE channel.server_id = %s and command = 'welcome' and users.server_id = channel.server_id;"
+        cursor.execute(fetch_channel_sql, (server_id,))
+        channel_result = cursor.fetchone()
+
+        if channel_result is None:
+            raise Exception("404 - Channel Not Found!")
+
+        
+        welcome_channel_id = channel_result[0]
+        welcome_channel = member.guild.get_channel(welcome_channel_id)
+
+        conn.commit()
+        
+
+    except Exception as e:
+        await welcome_channel.send(f"❌ Database error: {e}")
+
+    finally:
+        cursor.close()
+        conn.close()
+   
+
+    # global welcome_channel_id
+    if welcome_channel_id: # Replace with your channel ID
+        try:
+            welcome_channel = await clients.fetch_channel(welcome_channel_id)
+            joke = apikey.fetch_joke()
+            await welcome_channel.send(f"Welcome to the server, {member.mention}! Glad to see you here 🥰.")
+            await welcome_channel.send(f"**{joke}**")
+            await welcome_channel.send(f"{member.mention}, did you like the joke?")
+        except Exception as e:
+            print(f"❌ Failed to send welcome messages: {e}")
+            
+
+@clients.tree.command(name="heart", description="Sends a heart-iconed anime girl")
+async def heart(interaction):
+    # Make sure we defer or respond in time
+    await interaction.response.defer(thinking=False)
+    try:
+        await interaction.followup.send(file=discord.File("assets/heart.webp"))
+    except Exception as e:
+        await interaction.followup.send("✖️ 404- Not Found!")
+
 
 
 good_bye = ''

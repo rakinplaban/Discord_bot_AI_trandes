@@ -42,6 +42,17 @@ class DB_Connection:
             server_id BIGINT,
             FOREIGN KEY (server_id) REFERENCES server(id) ON DELETE CASCADE
         );
+
+        CREATE TABLE IF NOT EXISTS users(
+            id SERIAL PRIMARY KEY,
+            join_date TIMESTAMP NOT NULL,
+            user_id BIGINT NOT NULL UNIQUE,
+            name TEXT NOT NULL,
+            server_id BIGINT,
+            channel_id BIGINT,
+            FOREIGN KEY (server_id) REFERENCES server(id) ON DELETE CASCADE,
+            FOREIGN KEY (channel_id) REFERENCES channel(id)
+        );
             '''
             conn = self.db_connect()
             cursor = conn.cursor()
@@ -57,7 +68,7 @@ class DB_Connection:
 
     def drop_table(self):
         try:
-            sql = '''drop table channel; drop table server;'''
+            sql = '''drop table users;drop table channel; drop table server;'''
             conn = self.db_connect()
             cursor = conn.cursor()
             cursor.execute(sql)
