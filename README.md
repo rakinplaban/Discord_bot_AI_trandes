@@ -85,6 +85,15 @@ Synthia is a feature-rich Discord bot designed to provide real-time updates and 
 
 ---
 
+## Commands
+|Command     |Description                                       |
+|------------|--------------------------------------------------|
+|/news       |Get the latest AI news on selected channel        |
+|/welcome    |Welcome new members with joke on selected channel | 
+|/heart      |Sent heart shape made by an anime girl            |
+
+---
+
 ## Technologies Used
 
 - **Programming Language**: Python
