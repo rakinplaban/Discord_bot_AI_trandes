@@ -8,7 +8,6 @@ import requests
 from bs4 import BeautifulSoup as bfsoup
 import os
 from dotenv import load_dotenv
-import json
 from db_connection import DB_Connection
 
 load_dotenv()
@@ -84,7 +83,7 @@ async def on_ready():
     except Exception as e:
         print("Command sync failed:", e)
     scheduler.start()
-    scheduler.add_job(send_ai_news, CronTrigger(hour=1, minute=2,  timezone='Asia/Tokyo'))
+    scheduler.add_job(send_ai_news, CronTrigger(hour=0, minute=30,  timezone='Asia/Tokyo'))
     # await send_ai_news()
 
 

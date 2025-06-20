@@ -1,0 +1,30 @@
+version: '3.11'
+
+services:
+  db:
+    image: postgres:15
+    restart: always
+    ports:
+      - "${POSTGRES_PORT:-5432}:5432"
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    volumes:
+      - pg_data:/var/lib/postgresql/data
+
+  bot:
+    build: .
+    restart: always
+    depends_on:
+      - db
+    environment:
+      BOT_TOKEN: ${BOT_TOKEN}
+      DB_HOST: db
+      DB_PORT: 5432  # Always connect to internal container port
+      DB_NAME: ${POSTGRES_DB}
+      DB_USER: ${POSTGRES_USER}
+      DB_PASS: ${POSTGRES_PASSWORD}
+
+volumes:
+  pg_data:
