@@ -1,5 +1,5 @@
 APScheduler==3.11.0
-beautifulsoup4==4.12.3
+beautifulsoup4==4.13.4
 bs4==0.0.2
 charset-normalizer==3.4.0
 click==8.1.7
