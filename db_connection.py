@@ -8,10 +8,12 @@ class DB_Connection:
     def db_connect(self):
         try:
             connection = psycopg2.connect(
-                dbname=os.getenv('DB_NAME'),
-                user=os.getenv('DB_USER'),
-                password=os.getenv('DB_PASSWORD'),
-                host=os.getenv('DB_HOST')
+                dbname=os.getenv('POSTGRES_DB'),
+                user=os.getenv('POSTGRES_USER'),
+                password=os.getenv('POSTGRES_PASSWORD'),
+                # host=os.getenv('DB_HOST')
+                host = 'db_synthia',
+                port=5432
 
             )
 

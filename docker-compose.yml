@@ -1,7 +1,7 @@
 version: '3.11'
 
 services:
-  db:
+  db_synthia:
     image: postgres:15
     restart: always
     ports:
@@ -17,10 +17,10 @@ services:
     build: .
     restart: always
     depends_on:
-      - db
+      - db_synthia
     environment:
       BOT_TOKEN: ${BOT_TOKEN}
-      DB_HOST: db
+      DB_HOST: db_synthia
       DB_PORT: 5432  # Always connect to internal container port
       DB_NAME: ${POSTGRES_DB}
       DB_USER: ${POSTGRES_USER}
