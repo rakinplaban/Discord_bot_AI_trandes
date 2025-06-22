@@ -15,6 +15,7 @@ services:
 
   bot:
     build: .
+    image: "${BOT_IMAGE_NAME:-synthia_bot}"
     restart: always
     depends_on:
       - db_synthia

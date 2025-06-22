@@ -138,6 +138,8 @@ This project is licensed under the Apache-2.0 License. See the [LICENSE](LICENSE
 
 Enjoy using Synthia! If you encounter any issues or have feature requests, feel free to open an [issue](https://github.com/rakinplaban/Discord_chat_miku/issues) or contact me.
 
+🚧 Synthia is currently resting while we refactor our workflow to optimize GitHub Actions usage. She’ll be back soon with more efficient performance!
+
 <h1 align="center">
    <img src="https://animemagic.vercel.app/anime-image?t=123456" height="250" width="250"/>
 </h1>

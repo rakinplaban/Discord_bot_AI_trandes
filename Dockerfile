@@ -1,4 +1,4 @@
-FROM python:3.11-slim
+FROM python:3.11
 WORKDIR /code
 COPY . /code/
 RUN pip install --upgrade pip --timeout 100 \

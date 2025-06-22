@@ -11,8 +11,8 @@ class DB_Connection:
                 dbname=os.getenv('POSTGRES_DB'),
                 user=os.getenv('POSTGRES_USER'),
                 password=os.getenv('POSTGRES_PASSWORD'),
-                # host=os.getenv('DB_HOST')
-                host = 'db_synthia',
+                host=os.getenv('DB_HOST','db_synthia'),
+                #host = 'db_synthia',
                 port=5432
 
             )
