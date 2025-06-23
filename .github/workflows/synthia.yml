@@ -25,7 +25,7 @@ jobs:
         uses: docker/setup-buildx-action@v2
 
       - name: Build Docker Image
-        run: docker-compose build
+        run: docker compose build
 
   run-synthia:
     runs-on: ubuntu-latest
@@ -45,4 +45,4 @@ jobs:
           POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
           BOT_IMAGE_NAME: ${{ secrets.BOT_IMAGE_NAME }}
         run: |
-          docker-compose up --build --abort-on-container-exit
+          docker compose up --abort-on-container-exit
