@@ -17,6 +17,8 @@ services:
     build: .
     image: "${BOT_IMAGE_NAME:-synthia_bot}"
     restart: always
+    ports:
+      - "${POSTGRES_PORT:-8080}:8080"
     depends_on:
       - db_synthia
     environment:
