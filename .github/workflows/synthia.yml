@@ -1,6 +1,8 @@
 name: Synthia AI News Reporter
 
 on:
+  schedule:
+    - cron: '*/10 * * * *'
   workflow_dispatch:  
   push:
     branches: [master]  # or your default branch
@@ -21,5 +23,11 @@ jobs:
 
       - name: Build Docker Image
         run: docker compose build
+  
+  ping:
+    runs-on: ubuntu-latest
+    steps:
+      - run: curl -sSf https://discord-bot-ai-trandes.onrender.com/ || echo "Ping failed"
+    
 
   
