@@ -1,9 +1,7 @@
 name: Synthia AI News Reporter
 
 on:
-  schedule:
-    - cron: '0 */6 * * *'  # Every 6 hours
-  workflow_dispatch:  # Manual run
+  workflow_dispatch:  
   push:
     branches: [master]  # or your default branch
   pull_request:
