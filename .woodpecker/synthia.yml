@@ -1,0 +1,8 @@
+pipeline:
+  ping-synthia:
+    when:
+      cron: ping-synthia-cron
+    image: curlimages/curl
+    commands:
+      - echo "Pinging Synthia..."
+      - curl -sSf https://discord-bot-ai-trandes.onrender.com/ || echo "Ping failed"
