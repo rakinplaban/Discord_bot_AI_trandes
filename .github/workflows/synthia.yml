@@ -1,11 +1,11 @@
 name: Synthia AI News Reporter
 
 on:
-  schedule:
-    - cron: '*/10 * * * *'
   workflow_dispatch:  
   push:
-    branches: [master]  # or your default branch
+    branches: [master]
+    tags:
+      - 'v*.*.*' 
   pull_request:
     types: [closed]
 
@@ -23,11 +23,29 @@ jobs:
 
       - name: Build Docker Image
         run: docker compose build
+
+      # - name: Run tests inside container (optional)
+      #   run: docker compose run --rm app pytest || echo "Tests skipped or failed"
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          generate_release_notes: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GH_PAT }}
+
+      - name: Upload Release Asset
+        run: |
+          zip -r synthia-bot.zip . -x '*.git*' '__pycache__/*'
+        # Upload zipped project to the GitHub release
+      - name: Upload ZIP to Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: synthia-bot.zip
+        env:
+          GITHUB_TOKEN: ${{ secrets.GH_PAT }}
   
-  ping:
-    runs-on: ubuntu-latest
-    steps:
-      - run: curl -sSf https://discord-bot-ai-trandes.onrender.com/ || echo "Ping failed"
+  
     
 
   
